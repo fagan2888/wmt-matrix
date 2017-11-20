@@ -85,6 +85,10 @@ data = {
         'tr-en': 'http://matrix.statmt.org/matrix/systems_list/1876',
         'zh-en': 'http://matrix.statmt.org/matrix/systems_list/1878',
     },
+    'wmt16': {
+        'description': 'Official evaluation data for WMT 2016.',
+        'en-cs': 'http://matrix.statmt.org/matrix/systems_list/1844',
+    },
 }
 
 
@@ -118,19 +122,22 @@ def process_to_csv(rawfile, txtfile):
         out.writeheader()
 
         def leaf(node):
-            if node.find('p'):
-                return node.find('p').find(text=True)
+            text = None
+            if len(node.find_all('p')) == 1:
+                text = node.find('p').find(text=True)
             else:
-                return node.find(text=True)
+                text = node.find(text=True)
+            return text.rstrip() if text is not None else ''
 
         for row in rows[1:]:
             values = [leaf(x) for x in row.find_all('td')]
             if len(headers) == len(values):
                 out.writerow(dict(zip(headers, values)))
-#                print(values)
+                # print(values)
 
 
-def download_matrix_page(test_set, langpair=None):
+def download_matrix_page(test_set: str,
+                         langpair = None) -> List[csv.OrderedDict]:
     """Downloads the specified matrix page to the system location specified by the WMT environment variable.
 
     :param page: the test set to download
@@ -159,8 +166,12 @@ def download_matrix_page(test_set, langpair=None):
                 out.write(f.read())
 
         csvfile = os.path.join(outdir, '{}.{}.csv'.format(test_set, langpair))
-        if True: # not os.path.exists(csvfile):
+        if not os.path.exists(csvfile):
             process_to_csv(htmlpage, csvfile)
+
+            
+            # BLEU = namedtuple('BLEU', 'score, counts, totals, precisions, bp, sys_len, ref_len')
+            # return [ENTRY._make([, correct, total, precisions, brevity_penalty, sys_len, ref_len] for x in csv.DictReader(open(csvfile)))]
 
         return [x for x in csv.DictReader(open(csvfile))]
 
@@ -174,6 +185,12 @@ def main():
                             help='source-target language pair (2-char ISO639-1 codes)')
     arg_parser.add_argument('--download', type=str, default=None,
                             help='download a test set and quit')
+    arg_parser.add_argument('--description', action='store_true', default=False,
+                            help='print the system description')
+    arg_parser.add_argument('--constrained', '-c', action='store_true', default=False,
+                            help='Only constrained systems')
+    arg_parser.add_argument('--top-k', '-k', type=int, default=0,
+                            help='print top k systems (default: all)')
     arg_parser.add_argument('--quiet', '-q', default=False, action='store_true',
                             help='suppress informative output')
     arg_parser.add_argument('--encoding', '-e', type=str, default='utf-8',
@@ -204,7 +221,16 @@ def main():
         sys.exit(1)
 
     if args.test_set:
-        download_matrix_page(args.test_set, args.langpair)
+        d = download_matrix_page(args.test_set, args.langpair)
+        i = 0
+        for row in sorted(d, key=lambda x: x['BLEU-cased'], reverse=True):
+            if not args.constrained or row['Constraint'] == 'yes':
+                i += 1
+                if args.top_k == 0 or i <= args.top_k:
+                    print(row['System'], row['BLEU-cased'])
+                    if args.description:
+                        print(row['System Notes'])
+                        print('--')
 
 
 if __name__ == '__main__':
