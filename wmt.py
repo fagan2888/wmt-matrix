@@ -250,7 +250,7 @@ def main():
             if not args.constrained or row['Constraint'] == 'yes':
                 i += 1
                 if args.top_k == 0 or i <= args.top_k:
-                    print(row['System'], row['BLEU-cased'])
+                    print(row['System'], row['BLEU-cased'], sep='\t')
                     if args.description:
                         print(row['System Notes'])
                         print('--')
