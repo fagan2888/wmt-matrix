@@ -46,7 +46,7 @@ try:
 except ImportError:
     logging.warn('Could not import signal.SIGPIPE (this is expected on Windows machines)')
 
-VERSION = '1.1.5'
+VERSION = '0.0.5'
 
 # Where to store downloaded test sets.
 # Define the environment variable $SACREBLEU, or use the default of ~/.sacrebleu.
@@ -212,6 +212,8 @@ def main():
                             help='Only constrained systems')
     arg_parser.add_argument('--top-k', '-k', type=int, default=0,
                             help='print top k systems (default: all)')
+    arg_parser.add_argument('--score-only', '-b', action='store_true',
+                            help="Only print scores, not system names.")
     arg_parser.add_argument('--quiet', '-q', default=False, action='store_true',
                             help='suppress informative output')
     arg_parser.add_argument('--encoding', '-e', type=str, default='utf-8',
@@ -244,13 +246,22 @@ def main():
     if args.test_set:
         d = download_matrix_page(args.test_set, args.langpair)
         i = 0
-        for row in sorted(d, key=lambda x: float(x['BLEU-cased']), reverse=True):
+
+        def get_value(value):
+            if value == 'failed':
+                return -math.inf
+            return float(value)
+
+        for row in sorted(d, key=lambda x: get_value(x['BLEU-cased']), reverse=True):
             if row['BLEU-cased'] == 'failed':
                 continue
             if not args.constrained or row['Constraint'] == 'yes':
                 i += 1
                 if args.top_k == 0 or i <= args.top_k:
-                    print(row['System'], row['BLEU-cased'], sep='\t')
+                    if args.score_only:
+                        print(row['BLEU-cased'])
+                    else:
+                        print(row['System'], row['BLEU-cased'], sep='\t')
                     if args.description:
                         print(row['System Notes'])
                         print('--')
