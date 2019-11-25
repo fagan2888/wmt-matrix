@@ -68,6 +68,28 @@ NGRAM_ORDER = 4
 # Many of these are *.sgm files, which are processed to produced plain text that can be used by this script.
 # The canonical location of unpacked, processed data is $SACREBLEU/$TEST/$SOURCE-$TARGET.{$SOURCE,$TARGET}
 data = {
+    'wmt19': {
+        'description': 'Official results for WMT19.',
+        'en-cs': 'http://matrix.statmt.org/matrix/systems_list/1896',
+        'de-cs': 'http://matrix.statmt.org/matrix/systems_list/1897',
+        'cs-de': 'http://matrix.statmt.org/matrix/systems_list/1898',
+        'de-fr': 'http://matrix.statmt.org/matrix/systems_list/1899',
+        'fr-de': 'http://matrix.statmt.org/matrix/systems_list/1900',
+        'zh-en': 'http://matrix.statmt.org/matrix/systems_list/1901',
+        'de-en': 'http://matrix.statmt.org/matrix/systems_list/1902',
+        'fi-en': 'http://matrix.statmt.org/matrix/systems_list/1903',
+        'gg-en': 'http://matrix.statmt.org/matrix/systems_list/1904',
+        'kk-en': 'http://matrix.statmt.org/matrix/systems_list/1905',
+        'lt-en': 'http://matrix.statmt.org/matrix/systems_list/1906',
+        'ru-en': 'http://matrix.statmt.org/matrix/systems_list/1907',
+        'en-zh': 'http://matrix.statmt.org/matrix/systems_list/1908',
+        'en-de': 'http://matrix.statmt.org/matrix/systems_list/1909',
+        'en-fi': 'http://matrix.statmt.org/matrix/systems_list/1910',
+        'en-gg': 'http://matrix.statmt.org/matrix/systems_list/1911',
+        'en-kk': 'http://matrix.statmt.org/matrix/systems_list/1912',
+        'en-lt': 'http://matrix.statmt.org/matrix/systems_list/1913',
+        'en-ru': 'http://matrix.statmt.org/matrix/systems_list/1914',
+    },
     'wmt17': {
         'description': 'Official evaluation data.',
         'cs-en': 'http://matrix.statmt.org/matrix/systems_list/1866',
