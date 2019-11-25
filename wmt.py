@@ -244,7 +244,7 @@ def main():
     if args.test_set:
         d = download_matrix_page(args.test_set, args.langpair)
         i = 0
-        for row in sorted(d, key=lambda x: x['BLEU-cased'], reverse=True):
+        for row in sorted(d, key=lambda x: float(x['BLEU-cased']), reverse=True):
             if row['BLEU-cased'] == 'failed':
                 continue
             if not args.constrained or row['Constraint'] == 'yes':
