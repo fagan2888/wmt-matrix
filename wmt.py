@@ -191,7 +191,6 @@ def download_matrix_page(test_set: str,
         if not os.path.exists(csvfile):
             process_to_csv(htmlpage, csvfile)
 
-            
             # BLEU = namedtuple('BLEU', 'score, counts, totals, precisions, bp, sys_len, ref_len')
             # return [ENTRY._make([, correct, total, precisions, brevity_penalty, sys_len, ref_len] for x in csv.DictReader(open(csvfile)))]
 
@@ -246,6 +245,8 @@ def main():
         d = download_matrix_page(args.test_set, args.langpair)
         i = 0
         for row in sorted(d, key=lambda x: x['BLEU-cased'], reverse=True):
+            if row['BLEU-cased'] == 'failed':
+                continue
             if not args.constrained or row['Constraint'] == 'yes':
                 i += 1
                 if args.top_k == 0 or i <= args.top_k:
